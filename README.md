@@ -14,7 +14,7 @@
    
    Clone this repository:
     ```sh
-    git clone https://github.com/你的用戶名/你的項目.git
+    git clone https://github.com/DM-WuzuanTW/temporary/
     ```
 
 2. 安裝依賴項目：
