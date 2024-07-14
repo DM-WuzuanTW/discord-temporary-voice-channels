@@ -1,5 +1,8 @@
 const { Client, GatewayIntentBits, ChannelType, EmbedBuilder, PermissionsBitField } = require('discord.js');
-const { token, VOICE_CHANNEL_ID, CATEGORY_ID, LOG_CHANNEL_ID, CHAT_CHANNEL_ID ,TIME,REASON} = require('../config.json');
+const config = require('../config.json');
+
+const { token, VOICE_CHANNEL_ID, CATEGORY_ID, LOG_CHANNEL_ID, CHAT_CHANNEL_ID, TIME, REASON, ROLE_INCREASES, CREATOR_PERMISSIONS } = config;
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -49,7 +52,7 @@ function logCountdown(userId, seconds, count) {
             }, 1000);
         }
     } else {
-        console.error(`找不到 log 頻道：${LOG_CHANNEL_ID}`);
+        console.error(`Cannot find log channel: ${LOG_CHANNEL_ID} 【找不到 log 頻道：${LOG_CHANNEL_ID}】`);
     }
 }
 
@@ -60,9 +63,10 @@ function logToChannel(message) {
     if (logChannel) {
         logChannel.send(message);
     } else {
-        console.error(`找不到 log 頻道：${LOG_CHANNEL_ID}`);
+        console.error(`Cannot find log channel: ${LOG_CHANNEL_ID} 【找不到 log 頻道：${LOG_CHANNEL_ID}】`);
     }
 }
+
 client.on('voiceStateUpdate', async (oldState, newState) => {
     if (newState.channel && newState.channel.id === VOICE_CHANNEL_ID) {
         const guild = newState.guild;
@@ -88,31 +92,31 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
                 if (chatChannel && chatChannel.type === ChannelType.GuildText) {
                     const embed = new EmbedBuilder()
                         .setColor('#ff0000')
-                        .setTitle('警告')
-                        .setDescription(`<@${userId}> 在短時間內建立了多個語音頻道！`)
+                        .setTitle('Warning 警告')
+                        .setDescription(`<@${userId}> created multiple voice channels in a short time! 【在短時間內建立了多個語音頻道！】`)
                         .addFields(
-                            { name: "違規次數", value: `${userCreateCount[userId].count}`, inline: true },
-                            { name: "發布時間", value: formattedTime, inline: true }
+                            { name: "Violation Count 違規次數", value: `${userCreateCount[userId].count}`, inline: true },
+                            { name: "Post Time 發布時間", value: formattedTime, inline: true }
                         )
                         .setImage(guild.iconURL({ dynamic: true, size: 64 }));
                     chatChannel.send({ embeds: [embed] });
                 }
 
-                // 檢查 Bot 是否有權限對成員進行 timeout 操作
+                
                 if (guild.me.permissions.has(PermissionsBitField.Flags.ModerateMembers)) {
                     try {
                         await newState.member.timeout(TIME, REASON);
-                        console.log(`成員 ${userId} 已被 timeout`);
+                        console.log(`Member ${userId} has been timed out【成員 ${userId} 已被 timeout】`);
                     } catch (error) {
-                        console.error(`無法對成員 ${userId} 進行 timeout 操作:`, error);
+                        console.error(`Unable to timeout member ${userId}: ${error} 【無法對成員 ${userId} 進行 timeout 操作: ${error}】`);
                     }
                 } else {
-                    console.error(`Bot 沒有 MODERATE_MEMBERS 權限`);
+                    console.error(`Bot does not have MODERATE_MEMBERS permission【Bot 沒有 MODERATE_MEMBERS 權限】`);
                 }
             }
 
             guild.channels.create({
-                name: '臨時-' + newState.member.displayName,
+                name: 'Temporary-' + newState.member.displayName,
                 type: ChannelType.GuildVoice,
                 parent: category,
                 permissionOverwrites: [
@@ -137,21 +141,15 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
                         id: guild.roles.everyone.id,
                         deny: [PermissionsBitField.Flags.Connect],
                     },
+                    {
+                        id: newState.guild.ownerId,
+                        allow: CREATOR_PERMISSIONS.allow,
+                    }
                 ],
             }).then(channel => {
                 let userLimit = 50;
 
-                const roleIncreases = [
-                    '1249170994644652072', '1249170990827831318', '1249170986839052349', '1249170983433015367',
-                    '1249170979540832400', '1249170976072269955', '1249170972792061972', '1249170968711266304',
-                    '1249170963812323362', '1249170960439836693', '1249170957126471760', '1249170953225895967',
-                    '1249170948679270562', '1249170944300286022', '1249170940408107058', '1249170936494559316',
-                    '1249170932577337344', '1249170929234477170', '1249170925086183464', '1249170921340534865',
-                    '1249170917905666108', '1249170913803374633', '1249170910305325106', '1249170905993838684',
-                    '1249170902017642638', '1249170898787893361', '1145174048502984755'
-                ];
-
-                roleIncreases.forEach(role => {
+                ROLE_INCREASES.forEach(role => {
                     if (newState.member.roles.cache.has(role)) {
                         userLimit += 3;
                     }
@@ -163,32 +161,40 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
 
                 if (newState.member.voice.channel) {
                     newState.setChannel(channel).catch(console.error);
-                    logToChannel(`建立了新的語音頻道：${channel.name}`);
-                    console.log(`建立了新的語音頻道：${channel.name}`);
+                    logToChannel(`Created new voice channel: ${channel.name} 【建立了新的語音頻道：${channel.name}`);
+                    console.log(`Created new voice channel: ${channel.name} 【建立了新的語音頻道：${channel.name}`);
 
                     const voiceStateUpdateListener = (oldState, newState) => {
                         if (channel.members.size === 0) {
                             channel.delete().then(() => {
-                                logToChannel(`刪除了空的語音頻道：${channel.name}`);
-                                console.log(`刪除了空的語音頻道：${channel.name}`);
-                                channel.client.off('voiceStateUpdate', voiceStateUpdateListener);
+                                logToChannel(`Deleted empty voice channel: ${channel.name} 【刪除了空的語音頻道：${channel.name}`);
+                                console.log(`Deleted empty voice channel: ${channel.name} 【刪除了空的語音頻道：${channel.name}`);
                             }).catch(console.error);
                         }
                     };
-                    channel.client.on('voiceStateUpdate', voiceStateUpdateListener);
+
+                    client.on('voiceStateUpdate', voiceStateUpdateListener);
+
+                    setTimeout(() => {
+                        if (channel && channel.deletable && channel.members.size === 0) {
+                            channel.delete().then(() => {
+                                logToChannel(`Deleted inactive voice channel: ${channel.name} 【刪除了無成員活動的語音頻道：${channel.name}`);
+                                console.log(`Deleted inactive voice channel: ${channel.name} 【刪除了無成員活動的語音頻道：${channel.name}`);
+                            }).catch(console.error);
+                        }
+                        client.removeListener('voiceStateUpdate', voiceStateUpdateListener);
+                    }, 300000);
                 } else {
-                    console.log(`${newState.member.id} 已經不在語音頻道中`);
+                    channel.delete().catch(console.error);
+                    logToChannel(`Channel created before member left: ${channel.name} 【成員離開前已建立的語音頻道：${channel.name}`);
                 }
             }).catch(console.error);
         }
     }
 });
 
-
-
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
-    setInterval(resetUserCreateCount, 60000);
+client.once('ready', () => {
+    console.log('Ready! 【準備好了！】');
 });
 
 client.login(token);
