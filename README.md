@@ -33,7 +33,7 @@
     - `VOICE_CHANNEL_ID`: 監聽的語音頻道 ID | The ID of the voice channel to monitor
     - `CATEGORY_ID`: 用於創建臨時語音頻道的分類 ID | The category ID for creating temporary voice channels
     - `LOG_CHANNEL_ID`: 日誌頻道 ID | The log channel ID
-    - `CHAT_CHANNEL_ID`: 聊天頻道 ID | The chat channel ID
+    - `CHAT_CHANNEL_ID`: 逞罰頻道 ID | The punish channel ID
     - `REASON`: 違規原因 | Reason for violation
     - `TIME`: 禁言時間 | Mute duration
     - `ROLE_INCREASES`: 特定角色的 ID 列表，這些角色允許增加用戶限制 | List of role IDs that allow increasing user limits
