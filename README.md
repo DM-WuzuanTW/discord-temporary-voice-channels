@@ -61,7 +61,7 @@ Here is an example configuration for `config.json`:
     "VOICE_CHANNEL_ID": "Voice Channel ID【語音頻道ID】",
     "CATEGORY_ID": "Category ID【分類ID】",
     "LOG_CHANNEL_ID": "Log Channel ID【日誌頻道ID】",
-    "CHAT_CHANNEL_ID": "Chat Channel ID【聊天頻道ID】",
+    "CHAT_CHANNEL_ID": "punish Channel ID【逞罰頻道ID】",
     "REASON": "reason for violation【違規原因】",
     "TIME": "Reset user creation counter used for limiting operation frequency【重設使用者創建計數器，用於限制操作頻率】",
     "ROLE_INCREASES": ["RoleID 【身分組ID】"],
