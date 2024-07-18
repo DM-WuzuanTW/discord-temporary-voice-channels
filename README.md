@@ -18,7 +18,7 @@
 1. 下載這個存儲庫：  
    Clone this repository:
     ```sh
-    git clone https://github.com/DM-WuzuanTW/temporary/
+    git clone https://github.com/DM-WuzuanTW/discord-temporary-voice-channels/
     ```
 
 2. 安裝依賴項目：  
