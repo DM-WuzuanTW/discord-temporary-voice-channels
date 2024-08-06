@@ -35,7 +35,7 @@
     - `LOG_CHANNEL_ID`: 日誌頻道 ID | The log channel ID
     - `CHAT_CHANNEL_ID`: 逞罰頻道 ID | The punish channel ID
     - `REASON`: 違規原因 | Reason for violation
-    - `TIME`: 禁言時間 | Mute duration
+    - `TIME`: 重設使用者創建計數器，用於限制操作頻率 | Reset user creation counter used for limiting operation frequency
     - `ROLE_INCREASES`: 特定角色的 ID 列表，這些角色允許增加用戶限制 | List of role IDs that allow increasing user limits
     - `CREATOR_PERMISSIONS`: 創建者的權限設置 | Creator permissions settings
 
